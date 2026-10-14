@@ -1,0 +1,17 @@
+{
+  "sec_user_agent": "biotech-13f-tracker personal-use contact@example.com",
+  "openfigi_api_key": "",
+  "quarters": 8,
+  "port": 8013,
+  "funds": [
+    {"cik": "0001940272", "short": "ADAR1",      "name": "ADAR1 Capital Management"},
+    {"cik": "0001224962", "short": "Perceptive", "name": "Perceptive Advisors"},
+    {"cik": "0001263508", "short": "Baker Bros", "name": "Baker Bros. Advisors"},
+    {"cik": "0001839209", "short": "Darwin",     "name": "Darwin Global Management"},
+    {"cik": "0001346824", "short": "RA Capital", "name": "RA Capital Management"},
+    {"cik": "0001773195", "short": "Affinity",   "name": "Affinity Asset Advisors"},
+    {"cik": "0001055951", "short": "OrbiMed",    "name": "OrbiMed Advisors"},
+    {"cik": "0001493215", "short": "RTW",        "name": "RTW Investments"},
+    {"cik": "0001633313", "short": "Avoro",      "name": "Avoro Capital Advisors"}
+  ]
+}
