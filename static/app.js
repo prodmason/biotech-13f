@@ -474,6 +474,8 @@ async function viewFiling(cik, period, q) {
 
   const pq = cmp ? qshort(cmp) : 'prior';
   const isPrn = r => r.sh_type === 'PRN';
+  // Principal is only reported for notes (e.g. convertibles); skip the column for filings without any.
+  const hasPrincipal = d.rows.some(r => isPrn(r) && r.shares != null);
   const typeOk = r => st.type === 'all' || (st.type === 'shares' ? !r.put_call && !isPrn(r)
     : st.type === 'options' ? !!r.put_call : st.type === 'prn' ? isPrn(r) : r.put_call === st.type);
   const opt = (v, label, cur) => `<option value="${v}"${v === cur ? ' selected' : ''}>${label}</option>`;
@@ -492,7 +494,7 @@ async function viewFiling(cik, period, q) {
       { key: 'value', label: 'Value ($000)', num: true, fmt: fmt.k },
       { key: 'pct_port', label: '%', num: true, title: '% of reported 13F portfolio value', fmt: v => fmt.pct(v) },
       { key: 'shares', label: 'Shares', num: true, get: r => isPrn(r) ? null : r.shares, fmt: fmt.int },
-      { key: 'principal', label: 'Principal', num: true, get: r => isPrn(r) ? r.shares : null, fmt: fmt.int },
+      ...(hasPrincipal ? [{ key: 'principal', label: 'Principal', num: true, get: r => isPrn(r) ? r.shares : null, fmt: fmt.int }] : []),
       optCol,
       { key: 'pct_co', label: '% of Co.', num: true, title: 'Shares held ÷ shares outstanding', fmt: pctCoCell },
       ...(cmp ? [
