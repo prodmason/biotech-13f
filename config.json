@@ -12,6 +12,9 @@
     {"cik": "0001773195", "short": "Affinity",   "name": "Affinity Asset Advisors"},
     {"cik": "0001055951", "short": "OrbiMed",    "name": "OrbiMed Advisors"},
     {"cik": "0001493215", "short": "RTW",        "name": "RTW Investments"},
-    {"cik": "0001633313", "short": "Avoro",      "name": "Avoro Capital Advisors"}
+    {"cik": "0001633313", "short": "Avoro",      "name": "Avoro Capital Advisors"},
+    {"cik": "0001727492", "short": "Caligan",    "name": "Caligan Partners"},
+    {"cik": "0002018299", "short": "Boxer",      "name": "Boxer Capital Management"},
+    {"cik": "0001792126", "short": "Logos",      "name": "Logos Global Management"}
   ]
 }

@@ -212,15 +212,20 @@ def fetch_filing(conn, http, cik, acc, form, period, filed):
 
 # --- Step 2: effective positions per manager-quarter ----------------------------------------
 
-def effective_filings(filings):
-    """Apply amendments in filing order: a RESTATEMENT replaces the report, NEW HOLDINGS adds to it."""
+def effective_filings(filings, keys):
+    """Apply amendments in filing order: a RESTATEMENT replaces the report, NEW HOLDINGS adds to it.
+    Some filers label a full restatement NEW HOLDINGS (e.g. Logos Q2 2024 re-reported all 54
+    original positions plus 3 more), so one that repeats most positions already on file also
+    replaces the report instead of double-counting them. keys: accession -> {(cusip, put_call)}."""
     eff, base_rows = [], 0
     for f in filings:
         if not f["n_rows"]:
             continue  # cover-page-only amendment
         amend = (f["amendment_type"] or "").upper()
+        have = set().union(*(keys[e["accession"]] for e in eff))
         if (f["form"] == "13F-HR" or "RESTATEMENT" in amend
-                or (not amend and f["n_rows"] >= 0.5 * base_rows)):
+                or (not amend and f["n_rows"] >= 0.5 * base_rows)
+                or len(keys[f["accession"]] & have) > 0.5 * len(have)):
             eff, base_rows = [f], f["n_rows"]
         else:
             eff.append(f)
@@ -233,9 +238,12 @@ def derive_positions(conn):
     groups = defaultdict(list)
     for f in conn.execute("SELECT * FROM filings ORDER BY filed, accession"):
         groups[(f["cik"], f["period"])].append(f)
+    keys = defaultdict(set)
+    for acc, cusip, put_call in conn.execute("SELECT accession, cusip, put_call FROM holdings"):
+        keys[acc].add((cusip, put_call or ""))
 
     for (cik, period), filings in groups.items():
-        eff = effective_filings(filings)
+        eff = effective_filings(filings, keys)
         if not eff:
             continue
         applied = {f["accession"] for f in eff}

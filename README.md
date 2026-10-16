@@ -51,7 +51,8 @@ and exports to CSV. The top search box searches every security held by any track
 
 - **Source**: SEC EDGAR 13F-HR information tables.
   - Amendments are applied: a RESTATEMENT replaces the quarter's report, while NEW HOLDINGS
-    adds to it.
+    adds to it. A NEW HOLDINGS amendment that re-reports most of the positions already on file
+    is really a restatement (Logos did this for Q2 2024), so it replaces the report too.
   - Rows for the same security, option type, and share type are summed.
 - **Tickers**: OpenFIGI first. CUSIPs OpenFIGI doesn't cover fall back to SEC fails-to-deliver
   data, then an exact issuer-name match against SEC's company list.
