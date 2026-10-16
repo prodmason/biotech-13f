@@ -626,7 +626,9 @@ async function loadMeta() {
   META = await localApi('meta');
   $('#fundnav').innerHTML = META.funds.map(f =>
     `<a href="#/manager/${f.cik}" data-cik="${f.cik}" title="${esc(f.sec_name || f.name)}">${esc(f.short)}</a>`).join('');
-  $('#updated').textContent = META.updated_at ? 'Data updated ' + new Date(META.updated_at).toLocaleString() : '';
+  // Short date and time (no seconds) so the top bar stays on one line on a laptop screen.
+  $('#updated').textContent = META.updated_at
+    ? 'Data updated ' + new Date(META.updated_at).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : '';
 }
 
 async function pollRefresh(btn) {

@@ -38,9 +38,10 @@ a:hover { text-decoration: underline; }
 .mainnav a { font-weight: 600; }
 .fundnav { padding-left: 14px; border-left: 1px solid #34506f; font-size: 12px; }
 .search { margin-left: auto; }
-.search input { width: 220px; padding: 5px 8px; border-radius: 4px; border: 1px solid #34506f; background: #1c3554; color: #fff; }
+.search input { width: 200px; padding: 5px 8px; border-radius: 4px; border: 1px solid #34506f; background: #1c3554; color: #fff; }
 .search input::placeholder { color: #8ea2b8; }
 .updated { font-size: 11px; color: #8ea2b8; }
+.home { font-size: 12px; }
 .btn {
   padding: 4px 10px; border: 1px solid var(--border); border-radius: 4px; background: #fff;
   color: var(--fg); font: inherit; cursor: pointer;
