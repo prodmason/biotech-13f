@@ -236,7 +236,15 @@ const symCol = {
   fmt: (v, r) => `<a href="#/stock/${esc(r.cusip)}" title="All tracked holders of ${esc(r.issuer)}">${esc(v || '—')}</a>`,
 };
 const issuerCol = { key: 'issuer', label: 'Issuer Name' };
-const clsCol = { key: 'cls', label: 'Cl' };
+// 13F "title of class" is free text. Show every common-stock variant (COM, COM NEW, COMMON STOCK,
+// COM PAR $.01, ...) as "Common", keeping any share class or series (COM CL A -> Common Class A).
+function classLabel(cls) {
+  const c = (cls || '').trim();
+  if (!/\bCOM(MON)?\b/i.test(c)) return c;
+  const cl = c.match(/\b(?:CL|CLASS)\s+([A-Z])\b/i), ser = c.match(/\bSER(?:IES)?\s+([A-Z0-9]+)\b/i);
+  return 'Common' + (cl ? ` Class ${cl[1].toUpperCase()}` : '') + (ser ? ` Series ${ser[1].toUpperCase()}` : '');
+}
+const clsCol = { key: 'cls', label: 'Cl', get: r => classLabel(r.cls) };
 const optCol = { key: 'put_call', label: 'Option Type' };
 
 function pctCoCell(v, r) {
@@ -319,6 +327,7 @@ async function viewConsensus(q) {
   const table = mountTable($('#t'), {
     rows: d.rows, sort: ['n', 'desc'], csvName: `consensus-${period}.csv`, search: q.f || '',
     placeholder: 'Filter by ticker, issuer, fund…',
+    searchText: r => [r.sym, r.issuer, classLabel(r.cls), r.cusip, ...r.holders.map(h => h.short), ...r.exited].join(' '),
     toolbar: `<label>Min holders <input type="number" id="min" min="1" max="${funds.length}" value="${minHolders()}"></label>`,
     filter: r => r.n >= minHolders(),
     columns: [
@@ -338,7 +347,6 @@ async function viewConsensus(q) {
       { key: 'd_shares_pct', label: 'Net Δ Shares', num: true, title: `Combined share change vs ${qlabel(d.prev)} (funds that filed both quarters)`, fmt: v => fmt.sPct(v) },
       { key: 'n_new', label: 'New', num: true, get: r => r.new.length, title: 'Funds that initiated a position', fmt: (v, r) => v ? `<span class="pos" title="${esc(r.new.join(', '))}">${v}</span>` : '' },
       { key: 'n_exit', label: 'Exited', num: true, get: r => r.exited.length, title: 'Funds that sold out of the position', fmt: (v, r) => v ? `<span class="neg" title="${esc(r.exited.join(', '))}">${v}</span>` : '' },
-      { key: 'cusip', label: 'CUSIP' },
     ],
   });
   $('#min').oninput = e => { st.min = +e.target.value || 1; localStorage.setItem('minHolders', st.min); table.render(); };
@@ -523,7 +531,7 @@ async function viewStock(cusip, q) {
   app.innerHTML = `
     <h1>${esc(d.sym || d.cusip)} — ${esc(d.issuer)}</h1>
     <div class="sub">
-      <span>${esc(d.cls)}</span><span>CUSIP ${esc(d.cusip)}</span>${d.security_type ? `<span>${esc(d.security_type)}</span>` : ''}
+      <span>${esc(classLabel(d.cls))}</span><span>CUSIP ${esc(d.cusip)}</span>${d.security_type ? `<span>${esc(d.security_type)}</span>` : ''}
       ${so ? `<span>${fmt.big(so.shares)} shares outstanding (as of ${fmt.date(so.as_of)})</span>` : ''}
       ${d.issuer_cik ? `<span>${ext(secCompanyUrl(d.issuer_cik), 'Issuer filings')}</span>` : ''}
     </div>
